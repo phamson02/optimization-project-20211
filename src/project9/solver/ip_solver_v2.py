@@ -4,7 +4,7 @@ import numpy as np
 
 def ip_solver_v2(data):
 
-    N, K, d, time = data.N, data.K, data.d, data.t
+    N, K, d, time = data.N, data.K, data.d[1:], data.t
 
     for i in range(2*K):
         d.append(0)
