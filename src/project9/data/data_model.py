@@ -9,15 +9,15 @@ class Data:
         K: int
             Number of workers
         d: list
-            d[0] is set to be 0
-            d[i] is the time to fix the i-th customer
+            d[i-1] is the time to fix the i-th customer
         t: list of lists
             Matrix of travel times for each customer
     '''
+
     def __init__(self, N, K, d, t):
         self.N = N
         self.K = K
-        self.d = [0] + d # Add 0 to the front of d - fix time of the depot
+        self.d = d
         self.t = t
 
     @classmethod
@@ -58,7 +58,7 @@ class Data:
         l3 = f'd: {self.d}\n'
         l4 = f't:\n'
         l4 += '\n'.join(f'{i}: {self.t[i]}' for i in range(self.N+1))
-        
+
         return l1 + l2 + l3 + l4
 
     def save_as(self, filename):
