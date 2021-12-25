@@ -2,9 +2,9 @@ from ortools.linear_solver import pywraplp
 import numpy as np
 
 
-def ip_solver_v2(data):
+def ip_solver(data):
 
-    N, K, d, time = data.N, data.K, data.d[1:], data.t
+    N, K, d, time = data.N, data.K, data.d, data.t
 
     for i in range(2*K):
         d.append(0)
@@ -26,7 +26,6 @@ def ip_solver_v2(data):
         return m
 
     t = extend_matrix(time)
-    print(np.array(t))
 
     A = []
     for i in range(N + 2*K):
@@ -143,9 +142,7 @@ def ip_solver_v2(data):
     obj.SetCoefficient(a, 1)
     obj.SetMinimization()
 
-    rs = solver.Solve()
-
-    print(f'Optimal value = {obj.Value()}')
+    solver.Solve()
 
     def findNext(k, i):
         for j in Ao(i):
@@ -153,26 +150,28 @@ def ip_solver_v2(data):
                 return j
 
     def route(k):
-        s = ''
+        s = [0]
         i = k + N
-        while i != k + K + N:
-            s = s + str(i) + ' - '
+        while True:
             i = findNext(k, i)
-        s = s + str(k + K + N)
+            if i == N + K + k:
+                s += [0]
+                break
+            else:
+                s += [i + 1]
         return s
 
-    def travel_time(k):
-        time = 0
-        i = k + N
-        while i != k + K + N:
-            j = findNext(k, i)
-            time += t[i][j]
-            i = j
-        return time
-
+    print('Solver wall time', solver.WallTime(), 'ms')
+    print(f'Optimal cost: {obj.Value()}')
     for k in range(K):
-        print('route[', k, '] = ', route(k), '| fix_time =', y[k].solution_value(
-        ), '| travel_time =', travel_time(k), '| total_time =', travel_time(k) + y[k].solution_value())
-        for i, j in A:
-            if x[k][i][j].solution_value() > 0:
-                print('(', i, '-', j, ')', 't =', t[i][j])
+        route_k = route(k)
+        journey = f'Route[{k}] = ' + ' -> '.join(str(e) for e in route_k)
+        fix_time = f'fix time = {y[k].solution_value()}'
+        travel_time = f'travel time = {sum(data.t[i][j] for i, j in zip(route_k, route_k[1:]))}'
+        total_time = f' total time = {w[k].solution_value()}'
+        print(f'{journey} | {fix_time} | {travel_time} | {total_time}')
+        for i, j in zip(route_k, route_k[1:]):
+            s1 = f'{i} -> {j}'
+            s2 = f'travel time = {data.t[i][j]}'
+            s3 = f'fix time = {d[j-1]}' if j != 0 else 'fix time = 0'
+            print(f'{s1} | {s2} | {s3}')
