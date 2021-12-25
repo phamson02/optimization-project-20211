@@ -29,6 +29,7 @@ def proportion(cluster):
         total_time.append(temp)
     return max(total_time) - min(total_time), total_time
 
+
 for i in range(N):
     cluster[0].append(i+1)
 for k in range(K):
@@ -36,9 +37,11 @@ for k in range(K):
 print(cluster, end='\n\n')
 
 diff = 1e8
-cnt = 300000
+cnt = 200000
 while cnt != 0:
-    max_value = max([sum(cluster[k]) for k in range(K)])
+    _, total_time = proportion(cluster)
+    max_time = max(total_time)
+
     staffs = [k for k in range(K)]
     i = rd.choice(staffs)
     staffs.remove(i)
@@ -55,7 +58,8 @@ while cnt != 0:
             temp[k].extend(lst + [0])
 
         ratio, total_time = proportion(temp)
-        if 15*ratio + max(total_time) < 15*diff + max_value:
+
+        if max(total_time) < max_time:
             diff = ratio
             cluster = copy.deepcopy(temp)
 
