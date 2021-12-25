@@ -18,6 +18,7 @@ def cp_solver(data, time_limit=None):
     K = data.K
     d = data.d + [0] * (2*data.K)
 
+    # Recreate the travel time matrix with reindexed nodes
     t = [data.t[i][1:] + [data.t[i][0]] * (2*data.K)
          for i in range(1, data.N+1)]
     [t.append(data.t[0][1:] + [0] * (2*data.K)) for _ in range(2*data.K)]
@@ -26,10 +27,13 @@ def cp_solver(data, time_limit=None):
     def A_set():  # Set of valid arcs
         for i in range(N + 2*K):
             for j in range(N + 2*K):
+                # Cannot go into the start nodes, cannot go out of the end nodes, no loops
                 if (j not in range(N, N+K)) and (i not in range(N + K, N + 2*K)) and (i != j):
                     yield (i, j)
 
+    # Set of nodes that go out of node a
     def Ao(a): return (j for i, j in A_set() if i == a)
+    # Set of nodes that go into node a
     def Ai(a): return (i for i, j in A_set() if j == a)
 
     model = cp_model.CpModel()
