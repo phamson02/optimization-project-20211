@@ -202,9 +202,9 @@ def genetic_algo(
                 print(
                     f'Generation: {generation}\tFitness: {population[0].fitness}')
 
+        routes = population[0].to_routes()
         if return_res:
             print(f'\nBest individual is {population[0].fitness}')
-            routes = population[0].to_routes()
             for k in range(data.K):
                 route_k = routes[k+1]
                 journey = f'Route[{k}] = ' + \
