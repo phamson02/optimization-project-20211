@@ -220,4 +220,4 @@ def genetic_algo(
         else:
             return {'value': population[0].fitness, 'routes': routes}
 
-    main()
+    return main()
