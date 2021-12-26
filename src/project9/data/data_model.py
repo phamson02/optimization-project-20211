@@ -67,7 +67,7 @@ class Data:
         '''
         with open(filename, 'w') as f:
             f.write(f'{self.N} {self.K}\n')
-            f.write(' '.join(str(x) for x in self.d[1:]))
+            f.write(' '.join(str(x) for x in self.d))
             f.write('\n')
             for i in range(self.N+1):
                 f.write(' '.join(str(x) for x in self.t[i]))
