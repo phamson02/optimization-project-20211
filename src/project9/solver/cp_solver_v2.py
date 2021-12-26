@@ -81,7 +81,7 @@ def cp_solver(data, time_limit=None, return_routes=False):
     for i, j in A_set():
         model.Add(x[i][j] == 1).OnlyEnforceIf(b[i][j])
         model.Add(x[i][j] == 0).OnlyEnforceIf(b[i][j].Not())
-        # If there is an technician that travels from i to j,
+        # If there is a technician that travels from i to j,
         # the culmulative working time at j is equal to the
         # culmulative working time at i plus the travel time and the fix time at j
         model.Add(y[j] == y[i] + t[i][j] + d[j]).OnlyEnforceIf(b[i][j])
