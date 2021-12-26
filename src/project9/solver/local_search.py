@@ -116,3 +116,5 @@ def local_search(data):
             print()
 
         cnt -= 1
+
+    return max(total_time)

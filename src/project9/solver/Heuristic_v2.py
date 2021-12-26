@@ -112,3 +112,5 @@ def heuristic_v2(data):
     print("Optimal value:", max(total_time))
     end = time.time()
     print("Time = ", end - start)
+
+    return max(total_time)
