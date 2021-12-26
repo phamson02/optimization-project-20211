@@ -1,15 +1,9 @@
-import random as rd
 import numpy as np
 import time
 
 
-def heuristic_v2(data):
-
-    start = time.time()
-
+def BAB(data):
     N, K, d, t = data.N, data.K, data.d, data.t
-    d_new = [0]
-    d_new.extend(d)
 
     t_min = np.Infinity
     for i in range(N+1):
@@ -17,39 +11,47 @@ def heuristic_v2(data):
             if t[i][j] < t_min and i != j:
                 t_min = t[i][j]
 
-    # number of customs for each k
+    d_new = [0]
+    d_new.extend(d)
+
     cus_for_k = [0 for k in range(K)]
     j = N
     for k in range(K):
         cus_for_k[k] = int(np.ceil(j/(K-k)))
         j = N - sum(cus_for_k)
 
-    remaining_custumer = [i for i in range(1, N+1)]
-    lst = {k: [0] for k in range(K)}
-    time_consumption = [0 for k in range(K)]
+    def checkVisit(visited):
+        cnt = 0
+        for i in visited:
+            if i == False:
+                cnt += 1
+        return cnt
 
-    for k in range(K):
-        num_cus = cus_for_k[k]
-        while num_cus != 0 and len(remaining_custumer) != 0:
-            if len(lst[k]) == 1:
-                j = rd.choice(remaining_custumer)
-                lst[k].append(j)
-                remaining_custumer.remove(j)
-                time_consumption[k] += t[0][j] + d[j-1]
-                num_cus -= 1
-            else:
-                distance = []
-                i = lst[k][-1]
-                for j in remaining_custumer:
-                    distance.append((j, t[i][j]))
-                distance.sort(key=lambda item: item[1])
-                j = distance[0][0]
-                lst[k].append(j)
-                remaining_custumer.remove(j)
-                time_consumption[k] += t[i][j] + d[j-1]
-                num_cus -= 1
-        # lst[k].append(0)
-        time_consumption[k] += t[lst[k][-1]][0]
+    d = np.array(d)
+    print(cus_for_k)
+    remaining_custumer = cus_for_k
+    lst = {k: [0] for k in range(K)}
+    fixtime_for_k = np.array([0 for i in range(K)])
+    visited = [False for i in range(N+1)]
+    visited[0] = True
+
+    while checkVisit(visited) != 0:
+        pick_k = np.argmin(fixtime_for_k)
+        min = np.Infinity
+        min_index = 0
+        for cus in range(1, N+1):
+            if d_new[cus] < min and visited[cus] == False:
+                min = d_new[cus]
+                min_index = cus
+        if remaining_custumer[pick_k] == 0:
+            fixtime_for_k[pick_k] = sum(d)
+        else:
+            visited[min_index] = True
+            lst[pick_k].append(min_index)
+            fixtime_for_k[pick_k] += min
+            remaining_custumer[pick_k] -= 1
+
+    print("Arc for k:", lst)
 
     def fix_time(x):
         fix_time = 0
@@ -88,6 +90,7 @@ def heuristic_v2(data):
                 f = f - t[y[j-1]][i]
                 visited[i] = False
 
+    start = time.time()
     total_time = [0 for k in range(K)]
     for k in range(K):
         x = lst[k]
@@ -100,14 +103,6 @@ def heuristic_v2(data):
         BranchAndBound(x)
         total_time[k] = f_opt + fix_time(x)
 
-    '''
-
-    print(f'Optimal cost: {max(time_consumption)}')
-    for k in range(K):
-        print(f'route {k + 1} :', end=' ')
-        print(*lst[k], sep=' -> ', end=' | ')
-        print(f'cost = {time_consumption[k]}')
-    '''
     print("Total:", total_time)
     print("Optimal value:", max(total_time))
     end = time.time()
