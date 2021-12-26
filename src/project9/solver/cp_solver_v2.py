@@ -1,7 +1,7 @@
 from ortools.sat.python import cp_model
 
 
-def cp_solver(data, time_limit=None):
+def cp_solver(data, time_limit=None, return_routes=False):
     '''
     Solve the scheduling problem using the CP solver.
 
@@ -100,27 +100,27 @@ def cp_solver(data, time_limit=None):
         solver.parameters.max_time_in_seconds = time_limit
     status = solver.Solve(model)
 
-    # Function to print the solution
+    # Functions to print the solution
+
+    def next_of(i):
+        for j in Ao(i):
+            if solver.Value(x[i][j]) == 1:
+                return j
+        return None
+
+    def route(k):
+        s = [0]
+        i = k + N
+        while True:
+            i = next_of(i)
+            if i == N + K + k:
+                s += [0]
+                break
+            else:
+                s += [i + 1]
+        return s
+
     def print_solution():
-
-        def next_of(i):
-            for j in Ao(i):
-                if solver.Value(x[i][j]) == 1:
-                    return j
-            return None
-
-        def route(k):
-            s = [0]
-            i = k + N
-            while True:
-                i = next_of(i)
-                if i == N + K + k:
-                    s += [0]
-                    break
-                else:
-                    s += [i + 1]
-            return s
-
         print(f'Solver wall time {solver.WallTime()} s')
         print(f'Optimal cost: {solver.ObjectiveValue()}')
         for k in range(K):
@@ -137,6 +137,15 @@ def cp_solver(data, time_limit=None):
                 print(f'{s1} | {s2} | {s3}')
 
     if status == cp_model.OPTIMAL or status == cp_model.FEASIBLE:
-        print_solution()
+
+        if return_routes:
+            routes = {k: [] for k in range(1, K+1)}
+            for k in range(K):
+                routes[k+1] = route(k)
+            return routes
+
+        else:
+            print_solution()
+
     else:
         print('No solution found')

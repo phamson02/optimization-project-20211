@@ -2,7 +2,7 @@ import numpy as np
 import time
 
 
-def heuristic_greedy(data):
+def heuristic_greedy(data, return_routes=False):
     '''
     Solve the problem using a greedy heuristic.
     Heuristic: Assign the job with the smallest travel time + fix time 
@@ -45,17 +45,20 @@ def heuristic_greedy(data):
         x[k] += data.t[y[k][-1]][0]
         y[k].append(0)
 
-    print(f'Solving time: {time.time() - start_time}')
-    print(f'Optimal cost: {np.max(x)}')
+    if return_routes:
+        return {k+1: y[k] for k in range(data.K)}
+    else:
+        print(f'Solving time: {time.time() - start_time}')
+        print(f'Optimal cost: {np.max(x)}')
 
-    for k in range(data.K):
-        journey = f'Route[{k}] = ' + ' -> '.join(str(e) for e in y[k])
-        fix_time = f'fix time = {sum(data.d[e-1] if e != 0 else 0 for e in y[k])}'
-        travel_time = f'travel time = {sum(data.t[i][j] for i, j in zip(y[k], y[k][1:]))}'
-        total_time = f' total time = {x[k]}'
-        print(f'{journey} | {fix_time} | {travel_time} | {total_time}')
-        for i, j in zip(y[k], y[k][1:]):
-            s1 = f'{i} -> {j}'
-            s2 = f'travel time = {data.t[i][j]}'
-            s3 = f'fix time = {data.d[j-1]}' if j != 0 else 'fix time = 0'
-            print(f'{s1} | {s2} | {s3}')
+        for k in range(data.K):
+            journey = f'Route[{k}] = ' + ' -> '.join(str(e) for e in y[k])
+            fix_time = f'fix time = {sum(data.d[e-1] if e != 0 else 0 for e in y[k])}'
+            travel_time = f'travel time = {sum(data.t[i][j] for i, j in zip(y[k], y[k][1:]))}'
+            total_time = f' total time = {x[k]}'
+            print(f'{journey} | {fix_time} | {travel_time} | {total_time}')
+            for i, j in zip(y[k], y[k][1:]):
+                s1 = f'{i} -> {j}'
+                s2 = f'travel time = {data.t[i][j]}'
+                s3 = f'fix time = {data.d[j-1]}' if j != 0 else 'fix time = 0'
+                print(f'{s1} | {s2} | {s3}')
