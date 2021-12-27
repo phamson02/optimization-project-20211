@@ -3,7 +3,7 @@ import random as rd
 import copy
 
 
-def local_search(data):
+def local_search(data, iter=1000):
 
     N, K, d, t = data.N, data.K, data.d, data.t
 
@@ -72,7 +72,7 @@ def local_search(data):
     print(total_time)
 
     diff = 1e8
-    cnt = 100000
+    cnt = iter
     while cnt != 0:
         max_time = max(total_time)
 
