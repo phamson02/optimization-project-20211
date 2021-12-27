@@ -56,6 +56,9 @@ def genetic_algo(
 
         @classmethod
         def from_routes(cls, routes):
+            '''
+            convert routes to individual
+            '''
             genes = []
             r = []
             for k in routes:
@@ -153,11 +156,14 @@ def genetic_algo(
         population = []
 
         if INITIAL_SOLUTION:
+            # Extract optimal routes from heuristic greedy algorithm
             routes = heuristic_greedy(data, return_routes=True)
+            # Put it in the population
             gnome = Individual.from_routes(routes)
             population.append(gnome)
-            print(
-                f'Initial solution with fitness {gnome.fitness} is inserted into the population')
+            if not silent:
+                print(
+                    f'Initial solution with fitness {gnome.fitness} is inserted into the population')
             for _ in range(POPULATION_SIZE-1):
                 gnome = Individual.create_gnome()
                 population.append(gnome)
