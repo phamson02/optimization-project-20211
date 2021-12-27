@@ -167,10 +167,17 @@ def genetic_algo(
                 gnome = Individual.create_gnome()
                 population.append(gnome)
 
+        # sort the population in increasing order of fitness score
+        population = sorted(population, key=lambda x: x.fitness)
+
         for generation in range(ITERATIONS):
 
-            # sort the population in increasing order of fitness score
-            population = sorted(population, key=lambda x: x.fitness)
+            if not silent:
+                avg_fit = sum(ind.fitness for ind in population) / \
+                    POPULATION_SIZE
+                print(f'Generation: {generation}')
+                print(f'Average fitness: {avg_fit}')
+                print(f'Top 3: {[ind.fitness for ind in population[:3]]}')
 
             new_generation = []
 
@@ -198,9 +205,8 @@ def genetic_algo(
 
             population = new_generation
 
-            if not silent:
-                print(
-                    f'Generation: {generation}\tFitness: {population[0].fitness}')
+            # sort the population in increasing order of fitness score
+            population = sorted(population, key=lambda x: x.fitness)
 
         routes = population[0].to_routes()
         if not return_res:
